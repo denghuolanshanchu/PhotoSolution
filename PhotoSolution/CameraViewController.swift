@@ -547,7 +547,14 @@ class CameraViewController: UIViewController {
     func goToCameraAccessSetting(){
         let alert = UIAlertController(title: nil, message: self.customization.alertTextForCameraAccess, preferredStyle: .alert)
         alert.addAction( UIAlertAction(title: self.customization.settingButtonTextForCameraAccess, style: .cancel, handler: { action in
-            UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options: [:]) { (_) in
+                    self.dismiss(animated: false, completion: nil)
+                }
+            } else {
+                UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+                self.dismiss(animated: false, completion: nil)
+            }
         }))
         alert.addAction( UIAlertAction(title: self.customization.cancelButtonTextForCameraAccess, style: .default, handler: { action in
             self.solutionDelegate?.pickerCancel()
