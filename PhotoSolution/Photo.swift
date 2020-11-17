@@ -8,6 +8,7 @@
 
 import Foundation
 import Photos
+import UIKit
 
 class Photo{
     
@@ -32,7 +33,9 @@ class Photo{
         let option = PHImageRequestOptions()
         option.isSynchronous = true
         manager.requestImage(for: asset, targetSize:PHImageManagerMaximumSize, contentMode: .aspectFit, options: option) { (originImage, info) in
-            callback(originImage!)
+            if let image = originImage {
+                callback(image)
+            }
         }
     }
     
@@ -42,7 +45,9 @@ class Photo{
         option.isSynchronous = true
         option.resizeMode = .fast
         manager.requestImage(for: asset, targetSize: CGSize.init(width: compressedSize, height: compressedSize), contentMode: .aspectFit, options: option) { (originImage, info) in
-            callback(originImage!)
+            if let image = originImage {
+                callback(image)
+            }
         }
     }
     
@@ -52,7 +57,9 @@ class Photo{
         option.isSynchronous = false
         option.deliveryMode = .highQualityFormat
         manager.requestImage(for: asset, targetSize: CGSize.init(width: thumbnailSize, height: thumbnailSize), contentMode: .aspectFit, options: option) { (thumbnailImage, info) in
-            callback(thumbnailImage!)
+            if let image = thumbnailImage {
+                callback(image)
+            }
         }
     }
     

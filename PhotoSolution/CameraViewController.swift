@@ -306,6 +306,7 @@ class CameraViewController: UIViewController {
         cancelCameraButton.image = UIImage(named: "cancelIcon", in: self.podBundle, compatibleWith: nil)
         flashLightButton.image = UIImage(named: "flashOff", in: self.podBundle, compatibleWith: nil)
         settingButton.image = UIImage(named: "settingsToOpen", in: self.podBundle, compatibleWith: nil)
+        settingButton.isHidden = true
         
         settingsView.layer.masksToBounds = true
         settingsView.layer.cornerRadius = 15
@@ -527,7 +528,14 @@ class CameraViewController: UIViewController {
     func goToPhotoAccessSetting(){
         let alert = UIAlertController(title: nil, message: customization.alertTextForPhotoAccess, preferredStyle: .alert)
         alert.addAction( UIAlertAction(title: customization.settingButtonTextForPhotoAccess, style: .cancel, handler: { action in
-            UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options: [:]) { (_) in
+                    self.dismiss(animated: false, completion: nil)
+                }
+            } else {
+                UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+                self.dismiss(animated: false, completion: nil)
+            }
         }))
         alert.addAction( UIAlertAction(title: customization.cancelButtonTextForPhotoAccess, style: .default, handler: { action in
             self.solutionDelegate?.pickerCancel()

@@ -105,7 +105,14 @@ class PhotoCollectionViewController: UIViewController {
     func goToPhotoAccessSetting(){
         let alert = UIAlertController(title: nil, message: photoNavigationController.customization.alertTextForPhotoAccess, preferredStyle: .alert)
         alert.addAction( UIAlertAction(title: photoNavigationController.customization.settingButtonTextForPhotoAccess, style: .cancel, handler: { action in
-            UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(NSURL(string:UIApplication.openSettingsURLString)! as URL, options: [:]) { (_) in
+                    self.photoNavigationController.dismiss(animated: false, completion: nil)
+                }
+            } else {
+                UIApplication.shared.openURL(NSURL(string:UIApplication.openSettingsURLString)! as URL)
+                self.photoNavigationController.dismiss(animated: false, completion: nil)
+            }
         }))
         alert.addAction( UIAlertAction(title: photoNavigationController.customization.cancelButtonTextForPhotoAccess, style: .default, handler: { action in
             self.photoNavigationController.solutionDelegate?.pickerCancel()
@@ -160,6 +167,7 @@ class PhotoCollectionViewController: UIViewController {
         if segue.identifier == "showPhoto" {
             if let imageEditorViewController = segue.destination as? ImageEditorViewController {
                 let selectedIndex = sender as! Int
+                imageEditorViewController.modalPresentationStyle = .fullScreen
                 imageEditorViewController.currentPhotoList = currentPhotoList
                 imageEditorViewController.currentIndex = selectedIndex
                 imageEditorViewController.customization = photoNavigationController.customization
