@@ -63,20 +63,24 @@ class CameraViewController: UIViewController {
         AVCaptureDevice.requestAccess(for: AVMediaType.video) { response in
             if response {
                 PHPhotoLibrary.requestAuthorization { status in
-                    switch status {
-                    case .authorized:
-                        self.setupInput(isBackCamera: true)
-                        self.setFaceDetection()
-                    case .denied, .restricted:
-                        self.goToPhotoAccessSetting()
-                    case .notDetermined:
-                        self.goToPhotoAccessSetting()
-                    @unknown default:
-                        fatalError()
+                    DispatchQueue.main.async {
+                        switch status {
+                        case .authorized:
+                            self.setupInput(isBackCamera: true)
+                            self.setFaceDetection()
+                        case .denied, .restricted:
+                            self.goToPhotoAccessSetting()
+                        case .notDetermined:
+                            self.goToPhotoAccessSetting()
+                        @unknown default:
+                            fatalError()
+                        }
                     }
                 }
             } else {
-                self.goToCameraAccessSetting()
+                DispatchQueue.main.async {
+                    self.goToCameraAccessSetting()
+                }
             }
         }
         NotificationCenter.default.addObserver(self, selector:#selector(didChangeOrientation), name: UIDevice.orientationDidChangeNotification, object: nil)

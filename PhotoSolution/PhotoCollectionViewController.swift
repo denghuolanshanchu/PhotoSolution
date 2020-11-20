@@ -71,33 +71,35 @@ class PhotoCollectionViewController: UIViewController {
     private func getPhotos(){
         activityIndicator.startAnimating()
         PHPhotoLibrary.requestAuthorization { status in
-            switch status {
-            case .authorized:
-                let collections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil)
-                var maxPhotoAmount = 0
-                var maxPhotoAmountIndex = 0
-                self.albums = [Album]()
-                collections.enumerateObjects { (collection, idx, stop) in
-                    let album = Album(collection: collection)
-                    let photoAmount = album.getPhotoCount()
-                    if photoAmount > 0
-                    {
-                        self.albums!.append(album)
-                        if photoAmount > maxPhotoAmount{
-                            maxPhotoAmountIndex = self.albums!.count - 1
-                            maxPhotoAmount = photoAmount
+            DispatchQueue.main.async {
+                switch status {
+                case .authorized:
+                    let collections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .any, options: nil)
+                    var maxPhotoAmount = 0
+                    var maxPhotoAmountIndex = 0
+                    self.albums = [Album]()
+                    collections.enumerateObjects { (collection, idx, stop) in
+                        let album = Album(collection: collection)
+                        let photoAmount = album.getPhotoCount()
+                        if photoAmount > 0
+                        {
+                            self.albums!.append(album)
+                            if photoAmount > maxPhotoAmount{
+                                maxPhotoAmountIndex = self.albums!.count - 1
+                                maxPhotoAmount = photoAmount
+                            }
                         }
                     }
+                    self.photoNavigationController.albums = self.albums
+                    self.selectedAlbumIndex = maxPhotoAmountIndex
+                    self.showPhotoCollection()
+                case .denied, .restricted:
+                    self.goToPhotoAccessSetting()
+                case .notDetermined:
+                    self.goToPhotoAccessSetting()
+                @unknown default:
+                    fatalError()
                 }
-                self.photoNavigationController.albums = self.albums
-                self.selectedAlbumIndex = maxPhotoAmountIndex
-                self.showPhotoCollection()
-            case .denied, .restricted:
-                self.goToPhotoAccessSetting()
-            case .notDetermined:
-                self.goToPhotoAccessSetting()
-            @unknown default:
-                fatalError()
             }
         }
     }
